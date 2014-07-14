@@ -23,7 +23,7 @@ end
 
 function build.update(key)
 	if key == "ok" then
-		currentMap.map[build.curPos.y][build.curPos.x] = "*"
+		currentMap.map[build.curPos.y][build.curPos.x] = "#"
 		currentMap.health[build.curPos.y][build.curPos.x] = 60
 	elseif key == "down" then
 		build.curPos.y = build.curPos.y + 1

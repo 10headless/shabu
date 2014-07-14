@@ -9,25 +9,55 @@ bullet.maxPowTime = 1
 bullet.wAddPow = 10
 bullet.DMG = 20
 
-function bullet.create(axisX, axisY, pX, pY, pW)
-	if not (axisY == 0 and axisX == 0) then
-		local tmp = math.atan2(math.abs(axisY), math.abs(axisX))
+function bullet.create(controller, axisX, axisY, pX, pY, pW)
+	if controller == "gamepad" then
+		if not (axisY == 0 and axisX == 0) then
+			local tmp = math.atan2(math.abs(axisY), math.abs(axisX))
+			local yv = math.sin(tmp)*bullet.speed
+			local xv1 = bullet.speed^2 - yv^2 
+			local xv2 = math.sqrt(xv1) 
+			if axisX < 0 then
+				xv2 = -xv2
+			end
+			if axisY < 0 then
+				yv = -yv
+			end
+			local ymove = math.sin(tmp)*pW
+			local xmove1 = pW^2 - ymove^2 
+			local xmove2 = math.sqrt(xmove1) 
+			if axisX < 0 then
+				xmove2 = -xmove2
+			end
+			if axisY < 0 then
+				ymove = -ymove
+			end
+			if power ~= 0 then
+				table.insert(bullets, {x = pX+xmove2, y = pY+ymove, xvel = xv2, yvel = yv, w = bullet.w+bullet.wAddPow*(bullet.powTime/bullet.maxPowTime), dmg = bullet.DMG+bullet.DMG*(bullet.powTime/bullet.maxPowTime)})
+				bullet.powTime = 0
+			else
+				table.insert(bullets, {x = pX+xmove2, y = pY+ymove, xvel = xv2, yvel = yv, w = bullet.w, dmg = bullet.DMG})
+			end
+		end
+	else
+		local difX = axisX - pX
+		local difY = axisY - pY
+		local tmp = math.atan2(math.abs(difY), math.abs(difX))
 		local yv = math.sin(tmp)*bullet.speed
 		local xv1 = bullet.speed^2 - yv^2 
 		local xv2 = math.sqrt(xv1) 
-		if axisX < 0 then
+		if difX < 0 then
 			xv2 = -xv2
 		end
-		if axisY < 0 then
+		if difY < 0 then
 			yv = -yv
 		end
 		local ymove = math.sin(tmp)*pW
 		local xmove1 = pW^2 - ymove^2 
 		local xmove2 = math.sqrt(xmove1) 
-		if axisX < 0 then
+		if difX < 0 then
 			xmove2 = -xmove2
 		end
-		if axisY < 0 then
+		if difY < 0 then
 			ymove = -ymove
 		end
 		if power ~= 0 then

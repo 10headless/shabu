@@ -1,6 +1,11 @@
 require "bullets"
+require "camera"
 
 player = {}
+cUp = false
+cDown = false
+cLeft = false
+cRight = false
 
 function player.load(x, y)
 	player.x = x
@@ -10,6 +15,8 @@ function player.load(x, y)
 	player.friction = 3
 	player.xvel = 0
 	player.yvel = 0
+	player.health = 100
+	player.maxHealth = 100
 end
 
 --UPDATING**********************************
@@ -27,24 +34,52 @@ function player.physics(dt)
 end
 
 function player.control(dt)
-	if joystick:getGamepadAxis("leftx") > 0 and player.xvel < player.speed then
-		player.xvel = player.xvel + player.speed*dt*math.abs(joystick:getGamepadAxis("leftx"))/(1*(math.abs(joystick:getGamepadAxis("lefty"))+1))
+	if (joystick:getGamepadAxis("leftx") > 0 or love.keyboard.isDown(keys.right)) and player.xvel < player.speed and not cRight then
+		if joystick:getGamepadAxis("leftx") ~= 0 then
+			player.xvel = player.xvel + player.speed*dt*math.abs(joystick:getGamepadAxis("leftx"))/(1*(math.abs(joystick:getGamepadAxis("lefty"))+1))
+		else
+			if love.keyboard.isDown(keys.up) or love.keyboard.isDown(keys.down) then
+				player.xvel = player.xvel + player.speed*dt/math.sqrt(2)/2
+			else
+				player.xvel = player.xvel + player.speed*dt
+			end
+		end
 	end
-	if joystick:getGamepadAxis("leftx") < 0 and player.xvel > -player.speed then
-		player.xvel = player.xvel - player.speed*dt*math.abs(joystick:getGamepadAxis("leftx"))/(1*(math.abs(joystick:getGamepadAxis("lefty"))+1))
+	if (joystick:getGamepadAxis("leftx") < 0 or love.keyboard.isDown(keys.left)) and player.xvel > -player.speed and not cLeft then
+		if joystick:getGamepadAxis("leftx") ~= 0 then
+			player.xvel = player.xvel - player.speed*dt*math.abs(joystick:getGamepadAxis("leftx"))/(1*(math.abs(joystick:getGamepadAxis("lefty"))+1))
+		else
+			if love.keyboard.isDown(keys.up) or love.keyboard.isDown(keys.down) then
+				player.xvel = player.xvel - player.speed*dt/math.sqrt(2)/2
+			else
+				player.xvel = player.xvel - player.speed*dt
+			end
+		end
 	end
-	if joystick:getGamepadAxis("lefty") > 0 and player.yvel < player.speed then
-		player.yvel = player.yvel + player.speed*dt*math.abs(joystick:getGamepadAxis("lefty"))
+	if (joystick:getGamepadAxis("lefty") > 0 or love.keyboard.isDown(keys.down)) and player.yvel < player.speed and not cDown then
+		if joystick:getGamepadAxis("lefty") ~= 0 then
+			player.yvel = player.yvel + player.speed*dt*math.abs(joystick:getGamepadAxis("lefty"))
+		else
+			player.yvel = player.yvel + player.speed*dt
+		end
 	end
-	if joystick:getGamepadAxis("lefty") < 0 and player.yvel > -player.speed then
-		player.yvel = player.yvel - player.speed*dt*math.abs(joystick:getGamepadAxis("lefty"))
+	if (joystick:getGamepadAxis("lefty") < 0 or love.keyboard.isDown(keys.up)) and player.yvel > -player.speed and not cUp then
+		if joystick:getGamepadAxis("lefty") ~= 0 then
+			player.yvel = player.yvel - player.speed*dt*math.abs(joystick:getGamepadAxis("lefty"))
+		else
+			player.yvel = player.yvel - player.speed*dt
+		end
 	end
-	if joystick:isGamepadDown("rightshoulder") then
+	if joystick:isGamepadDown("rightshoulder") or love.mouse.isDown("l") then
 		if bullet.slowDown < bullet.time then
-	        player.shoot()
+			if love.mouse.isDown("l") then
+				player.shoot("mouse")
+			else
+	        	player.shoot("gamepad")
+	        end
 	        bullet.time = 0
 	    end
-    elseif joystick:isGamepadDown("leftshoulder") then
+    elseif joystick:isGamepadDown("leftshoulder") or love.mouse.isDown("r") then
     	if bullet.powTime < bullet.maxPowTime then
     		bullet.powTime = bullet.powTime + dt
    		elseif bullet.powTime > bullet.maxPowTime then
@@ -55,12 +90,20 @@ function player.control(dt)
     end
 end
 
-function player.shoot()
-	bullet.create(joystick:getGamepadAxis("rightx"), joystick:getGamepadAxis("righty"), player.x, player.y, player.w+5)
+function player.shoot(controller)
+	if controller == "gamepad" then
+		bullet.create(controller, joystick:getGamepadAxis("rightx"), joystick:getGamepadAxis("righty"), player.x, player.y, player.w+5)
+	else
+		bullet.create(controller, love.mouse.getX()+camera.x, love.mouse.getY()+camera.y, player.x, player.y, player.w+5)
+	end
 end
 
 --DRAWING************************************
 function player.draw()
 	love.graphics.setColor(0,0,0)
 	love.graphics.circle("fill", player.x, player.y, player.w)
+	love.graphics.setColor(255,0,0)
+	love.graphics.arc( "fill", player.x, player.y, player.w, 0, (math.pi*2)*(player.health/player.maxHealth))
+	love.graphics.setColor(0,0,0)
+	love.graphics.circle("fill", player.x, player.y, player.w-7)
 end

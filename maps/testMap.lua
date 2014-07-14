@@ -20,4 +20,4 @@ m = [[
 *                                                              *
 ****************************************************************]]
 
-spa = {{typ = 1, spawnTime = 15, timer = 15},{typ = 1, spawnTime = 30, timer = 15}}
+spa = {{typ = 1, spawnTime = 4, timer = 3},{typ = 2, spawnTime = 3, timer = 2}}

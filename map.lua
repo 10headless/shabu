@@ -5,7 +5,7 @@ map = {}
 currentMap = {}
 currentMap.health = {{}}
 currentMap.color = {}
-solids = {"*", "^"}
+solids = {"*", "^", "?", "#"}
 
 function map.load(name)
 	love.filesystem.load("maps/"..name) ()
@@ -25,11 +25,15 @@ function map.load(name)
 		currentMap.health[i] = {}
 		for j, b in ipairs(v) do
 			if b == "*" then
-				currentMap.health[i][j] = 60 
+				currentMap.health[i][j] = 10000 
 			elseif b == " " then
 				currentMap.health[i][j] = 0
 			elseif b == "^" then
-				currentMap.health[i][j] = 100
+				if spa[spawnersCount].typ == 1 then
+					currentMap.health[i][j] = 100
+				elseif spa[spawnersCount].typ == 2 then
+					currentMap.health[i][j] = 100
+				end
 				spa[spawnersCount].x = j
 				spa[spawnersCount].y = i
 				spa[spawnersCount].spawn = true
@@ -54,14 +58,30 @@ function map.draw()
 			end
 			if char == "^" then
 				local tmpSpawner = currentMap.spawners[spawnersCount]
-				if tmpSpawner.typ == 1 then
+				if tmpSpawner.typ == 1 or tmpSpawner.typ == 2 then
 					love.graphics.setColor(50,50,50)
 					love.graphics.rectangle("fill", (j-1)*40, (i-1)*40, 40, 40)
+					love.graphics.polygon("fill", (j-1)*40, (i-1)*40, j*40, (i-1)*40, (j-1)*40+20, (i-1)*40-20)
+					love.graphics.polygon("fill", (j-1)*40, (i-1)*40, (j-1)*40, (i)*40, (j-1)*40-20, (i-1)*40+20)
+					love.graphics.polygon("fill", (j-1)*40, (i)*40, j*40, (i)*40, (j-1)*40+20, (i+1)*40-20)
+					love.graphics.polygon("fill", (j)*40, (i-1)*40, j*40, (i)*40, (j)*40+20, (i)*40-20)
 					love.graphics.setColor(0,0,255)
 					love.graphics.circle("fill", (j-1)*40+20, (i-1)*40+20, 12.5)
 				end
 				map.checkCollision((j-1)*40, (i-1)*40, 40, char)
 				spawnersCount = spawnersCount + 1
+			end
+			if char == "*" then
+				love.graphics.setColor(50,50,50)
+				love.graphics.rectangle("fill", (j-1)*40, (i-1)*40, 40, 40)
+				--COLLISION HANDLING****
+				map.checkCollision((j-1)*40, (i-1)*40, 40, char)
+			end
+			if char == "#" then
+				love.graphics.setColor(100,100,100)
+				love.graphics.rectangle("fill", (j-1)*40, (i-1)*40, 40, 40)
+				--COLLISION HANDLING****
+				map.checkCollision((j-1)*40, (i-1)*40, 40, char)
 			end
 		end
 	end
@@ -80,29 +100,28 @@ function map.checkCollision(mX, mY, mW, ch)
 	if checkColl("rc", {x = mX, y = mY, w = mW}, player) then
 		sth = ""
 		if player.x+player.w >= mX and player.x+player.w <= mX + mW/2 and player.xvel > 0 then
-			sth = sth .. "r"
+			player.xvel = 0
+			cRight = true
+		else
+			cRight = false
 		end
 		if player.x-player.w <= mX+mW and player.x-player.w >= mX + mW/2 and player.xvel < 0 then
-			sth = sth .. "l"
+			player.xvel = 0
+			cLeft = true
+		else
+			cLeft = false
 		end
 		if player.y+player.w >= mY and player.y+player.w <= mY + mW/2 and player.yvel > 0 then
-			sth = sth .. "d"
+			player.yvel = 0
+			cDown = true
+		else
+			cDown = false
 		end
 		if player.y-player.w <= mY+mW and player.y-player.w >= mY + mW/2 and player.yvel < 0 then
-			sth = sth .. "u"
-		end
-		if sth == "r" then
-			player.xvel = 0
-			player.x = mX-player.w
-		elseif sth == "l" then
-			player.xvel = 0
-			player.x = mX+player.w*2
-		elseif sth == "d" then
 			player.yvel = 0
-			player.y = mY-player.w
-		elseif sth == "u" then
-			player.yvel = 0
-			player.y = mY+player.w*2
+			cUp = true
+		else
+			cUp = false
 		end
 	end
 	for i, v in ipairs(enemies) do
@@ -138,19 +157,29 @@ function map.checkCollision(mX, mY, mW, ch)
 	remWalls = {}
 	remShots = {}
 	for i, v in ipairs(bullets) do
-		if checkColl("rc", {x = mX, y = mY, w = mW}, {x= v.x, y = v.y, w = bullet.w}) then
-			local RTx = mX/40+1
-			local RTy = mY/40+1
-			currentMap.health[RTy][RTx] = currentMap.health[RTy][RTx] - v.dmg
-			table.insert(remShots, i)
-			if currentMap.health[RTy][RTx] <= 0 then
-				table.insert(remWalls, {x = RTx, y = RTy})
-				if ch == "^" then
+		if ch == "^" then
+			if checkColl("rc", {x1 = mX+20, y1 = mY-20, x2 = mX+60, y2 = mY+20, x3 = mX+20, y3 = mY+60, x4 = mX-20, y4 = mY+20, autom = true}, {x= v.x, y = v.y, w = bullet.w}) then
+				local RTx = mX/40+1
+				local RTy = mY/40+1
+				currentMap.health[RTy][RTx] = currentMap.health[RTy][RTx] - v.dmg
+				table.insert(remShots, i)
+				if currentMap.health[RTy][RTx] <= 0 then
+					table.insert(remWalls, {x = RTx, y = RTy})
 					for j, b in ipairs(currentMap.spawners) do
 						if b.x == RTx and b.y == RTy then
 							b.spawn = false
 						end
 					end
+				end
+			end
+		else
+			if checkColl("rc", {x = mX, y = mY, w = mW}, {x= v.x, y = v.y, w = bullet.w}) then
+				local RTx = mX/40+1
+				local RTy = mY/40+1
+				currentMap.health[RTy][RTx] = currentMap.health[RTy][RTx] - v.dmg
+				table.insert(remShots, i)
+				if currentMap.health[RTy][RTx] <= 0 then
+					table.insert(remWalls, {x = RTx, y = RTy})
 				end
 			end
 		end
@@ -169,25 +198,37 @@ function map.updateSpawners(dt)
 			v.timer = v.timer + dt
 			if v.timer >= v.spawnTime then
 				v.timer = 0
+				local tmpTh = {}
 				if v.typ == 1 then
-					local happend = false
-					if not isBlockSolid(currentMap.map[v.y][v.x-1]) and not isBlockSolid(currentMap.map[v.y][v.x-2]) and not isBlockSolid(currentMap.map[v.y-1][v.x-1]) and not isBlockSolid(currentMap.map[v.y+1][v.x-1]) then
-						enemy.load((v.x-3)*40+20, (v.y-1)*40+20, 40, 100,100)
-						happend = true
-					end
-					if not happend and not isBlockSolid(currentMap.map[v.y][v.x+1]) and not isBlockSolid(currentMap.map[v.y][v.x+2]) and not isBlockSolid(currentMap.map[v.y-1][v.x+1]) and not isBlockSolid(currentMap.map[v.y+1][v.x+1]) then
-						enemy.load((v.x+1)*40+20, (v.y-1)*40+20, 40, 100,100)
-						happend = true
-					end
-					if not happend and not isBlockSolid(currentMap.map[v.y-1][v.x]) and not isBlockSolid(currentMap.map[v.y-2][v.x]) and not isBlockSolid(currentMap.map[v.y-1][v.x-1]) and not isBlockSolid(currentMap.map[v.y-1][v.x+1]) then
-						enemy.load((v.x-1)*40+20, (v.y-3)*40+20, 40, 100,100)
-						happend = true
-					end
-					if not happend and not isBlockSolid(currentMap.map[v.y+1][v.x]) and not isBlockSolid(currentMap.map[v.y+2][v.x]) and not isBlockSolid(currentMap.map[v.y+1][v.x-1]) and not isBlockSolid(currentMap.map[v.y-1][v.x+1]) then
-						enemy.load((v.x-1)*40+20, (v.y+1)*40+20, 40, 100,100)
-						happend = true
-					end
+					tmpTh.speed = 100
+					tmpTh.maxHealth = 100
+					tmpTh.radius = 40
+					tmpTh.damage = 50
 				end
+				if v.typ == 2 then
+					tmpTh.speed = 150
+					tmpTh.maxHealth = 50
+					tmpTh.radius = 20
+					tmpTh.damage = 20
+				end
+				local happend = false
+				if not isBlockSolid(currentMap.map[v.y][v.x-1]) and not isBlockSolid(currentMap.map[v.y][v.x-2]) and not isBlockSolid(currentMap.map[v.y-1][v.x-1]) and not isBlockSolid(currentMap.map[v.y+1][v.x-1]) then
+					enemy.load((v.x-3)*40+20, (v.y-1)*40+20, tmpTh.radius, tmpTh.speed,tmpTh.maxHealth, tmpTh.damage)
+					happend = true
+				end
+				if not happend and not isBlockSolid(currentMap.map[v.y][v.x+1]) and not isBlockSolid(currentMap.map[v.y][v.x+2]) and not isBlockSolid(currentMap.map[v.y-1][v.x+1]) and not isBlockSolid(currentMap.map[v.y+1][v.x+1]) then
+					enemy.load((v.x+1)*40+20, (v.y-1)*40+20, tmpTh.radius, tmpTh.speed,tmpTh.maxHealth, tmpTh.damage)
+					happend = true
+				end
+				if not happend and not isBlockSolid(currentMap.map[v.y-1][v.x]) and not isBlockSolid(currentMap.map[v.y-2][v.x]) and not isBlockSolid(currentMap.map[v.y-1][v.x-1]) and not isBlockSolid(currentMap.map[v.y-1][v.x+1]) then
+					enemy.load((v.x-1)*40+20, (v.y-3)*40+20, tmpTh.radius, tmpTh.speed,tmpTh.maxHealth, tmpTh.damage)
+					happend = true
+				end
+				if not happend and not isBlockSolid(currentMap.map[v.y+1][v.x]) and not isBlockSolid(currentMap.map[v.y+2][v.x]) and not isBlockSolid(currentMap.map[v.y+1][v.x-1]) and not isBlockSolid(currentMap.map[v.y-1][v.x+1]) then
+					enemy.load((v.x-1)*40+20, (v.y+1)*40+20, tmpTh.radius, tmpTh.speed,tmpTh.maxHealth, tmpTh.damage)
+					happend = true
+				end
+			
 			end
 		end
 	end

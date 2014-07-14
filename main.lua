@@ -7,7 +7,9 @@ utils = require 'pl.utils'
 require('pl.stringx').import()
 require "build"
 
+keys = {left = "a",right = "d",up = "w",down = "s",build = "lctrl", ok = "return"}
 gamestate = "game"
+
 
 function love.load()
     local joysticks = love.joystick.getJoysticks()
@@ -64,24 +66,47 @@ function checkColl(type, o1, o2)
 	if type == "cc" then
 		return checkCircleDis(o1, o2)
 	elseif type == "rc" then
+        if o1.autom ~= nil then
+            local tmpx1 = o1.x3 - o1.x4
+            local tmpy1 = o1.y3 - o1.y4
+            o1.w = math.sqrt(tmpx1^2 + tmpy1^2)
+            o1.x = o1.x1+20
+            o1.y = o1.y1+20 
+        end
 		if checkCircleDis({x = o1.x+o1.w/2, y = o1.y+o1.w/2, w = o1.w/2}, o2) then
             return true
         else
             for tmp = 1, 4 do
-                tmpX = 0
-                tmpY = 0
-                if tmp == 1 then
-                    tmpX = o1.x
-                    tmpY = o1.y
-                elseif tmp == 2 then
-                    tmpX = o1.x + o1.w
-                    tmpY = o1.y
-                elseif tmp == 3 then
-                    tmpX = o1.x + o1.w
-                    tmpY = o1.y + o1.w
-                elseif tmp == 4 then
-                    tmpX = o1.x
-                    tmpY = o1.y + o1.w
+                local tmpX = 0
+                local tmpY = 0
+                if o1.autom == nil then
+                    if tmp == 1 then
+                        tmpX = o1.x
+                        tmpY = o1.y
+                    elseif tmp == 2 then
+                        tmpX = o1.x + o1.w
+                        tmpY = o1.y
+                    elseif tmp == 3 then
+                        tmpX = o1.x + o1.w
+                        tmpY = o1.y + o1.w
+                    elseif tmp == 4 then
+                        tmpX = o1.x
+                        tmpY = o1.y + o1.w
+                    end
+                else
+                    if tmp == 1 then
+                        tmpX = o1.x1
+                        tmpY = o1.y1
+                    elseif tmp ==2 then
+                        tmpX = o1.x2
+                        tmpY = o1.y2
+                    elseif tmp ==3 then
+                        tmpX = o1.x3
+                        tmpY = o1.y3
+                    elseif tmp ==4 then
+                        tmpX = o1.x4
+                        tmpY = o1.y4
+                    end
                 end
                 if checkCircleDis({x = tmpX, y= tmpY, w = 1}, o2) then
                     return true
@@ -92,7 +117,9 @@ function checkColl(type, o1, o2)
 	elseif type == "rr" then
 		local ax2,ay2,bx2,by2 = o1.x + o1.w, o1.y + o1.h, o2.x + o2.w, o2.y + o2.h
   		return ax1 < bx2 and ax2 > bx1 and ay1 < by2 and ay2 > by1
-	end
+	elseif type == "OMG" then
+
+    end
 end
 
 function love.joystickpressed(joystick,button)
@@ -124,8 +151,40 @@ function love.joystickpressed(joystick,button)
         end
     end
 end
+function love.keypressed( key, isrepeat )
+    if gamestate == "pause" then
+        if key == keys.ok then
+            build.update("ok")
+        end
+        if key == keys.up then
+            build.update("up")
+        end
+        if key == keys.down then
+            build.update("down")
+        end
+        if key == keys.left then
+            build.update("left")
+        end
+        if key == keys.right then
+            build.update("right")
+        end
+    end
+    if key == keys.build then
+        if gamestate == "game" then
+            gamestate = "pause"
+            build.load(player.x, player.y)
+        else
+            if gamestate =="pause" then
+                gamestate = "game"
+            end
+        end
+    end
+end
 
 function isBlockSolid(char)
+    if char == "?" then
+        return false
+    end
     for i, v in ipairs(solids) do
         if v == char then
             return true
