@@ -192,3 +192,19 @@ function isBlockSolid(char)
     end
     return false
 end
+
+function checkGamepadAxis(axis)
+    if joystick ~= nil then
+        return joystick:getGamepadAxis(axis) 
+    else
+        return 0
+    end
+end
+
+function checkGamepadButton(button)
+    if joystick ~= nil then
+        return joystick:isGamepadDown(button) 
+    else
+        return false
+    end
+end

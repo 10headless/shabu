@@ -34,9 +34,9 @@ function player.physics(dt)
 end
 
 function player.control(dt)
-	if (joystick:getGamepadAxis("leftx") > 0 or love.keyboard.isDown(keys.right)) and player.xvel < player.speed and not cRight then
-		if joystick:getGamepadAxis("leftx") ~= 0 then
-			player.xvel = player.xvel + player.speed*dt*math.abs(joystick:getGamepadAxis("leftx"))/(1*(math.abs(joystick:getGamepadAxis("lefty"))+1))
+	if (checkGamepadAxis("leftx") > 0 or love.keyboard.isDown(keys.right)) and player.xvel < player.speed and not cRight then
+		if checkGamepadAxis("leftx") ~= 0 then
+			player.xvel = player.xvel + player.speed*dt*math.abs(checkGamepadAxis("leftx"))/(1*(math.abs(checkGamepadAxis("lefty"))+1))
 		else
 			if love.keyboard.isDown(keys.up) or love.keyboard.isDown(keys.down) then
 				player.xvel = player.xvel + player.speed*dt/math.sqrt(2)/2
@@ -45,9 +45,9 @@ function player.control(dt)
 			end
 		end
 	end
-	if (joystick:getGamepadAxis("leftx") < 0 or love.keyboard.isDown(keys.left)) and player.xvel > -player.speed and not cLeft then
-		if joystick:getGamepadAxis("leftx") ~= 0 then
-			player.xvel = player.xvel - player.speed*dt*math.abs(joystick:getGamepadAxis("leftx"))/(1*(math.abs(joystick:getGamepadAxis("lefty"))+1))
+	if (checkGamepadAxis("leftx") < 0 or love.keyboard.isDown(keys.left)) and player.xvel > -player.speed and not cLeft then
+		if checkGamepadAxis("leftx") ~= 0 then
+			player.xvel = player.xvel - player.speed*dt*math.abs(checkGamepadAxis("leftx"))/(1*(math.abs(checkGamepadAxis("lefty"))+1))
 		else
 			if love.keyboard.isDown(keys.up) or love.keyboard.isDown(keys.down) then
 				player.xvel = player.xvel - player.speed*dt/math.sqrt(2)/2
@@ -56,21 +56,21 @@ function player.control(dt)
 			end
 		end
 	end
-	if (joystick:getGamepadAxis("lefty") > 0 or love.keyboard.isDown(keys.down)) and player.yvel < player.speed and not cDown then
-		if joystick:getGamepadAxis("lefty") ~= 0 then
-			player.yvel = player.yvel + player.speed*dt*math.abs(joystick:getGamepadAxis("lefty"))
+	if (checkGamepadAxis("lefty") > 0 or love.keyboard.isDown(keys.down)) and player.yvel < player.speed and not cDown then
+		if checkGamepadAxis("lefty") ~= 0 then
+			player.yvel = player.yvel + player.speed*dt*math.abs(checkGamepadAxis("lefty"))
 		else
 			player.yvel = player.yvel + player.speed*dt
 		end
 	end
-	if (joystick:getGamepadAxis("lefty") < 0 or love.keyboard.isDown(keys.up)) and player.yvel > -player.speed and not cUp then
-		if joystick:getGamepadAxis("lefty") ~= 0 then
-			player.yvel = player.yvel - player.speed*dt*math.abs(joystick:getGamepadAxis("lefty"))
+	if (checkGamepadAxis("lefty") < 0 or love.keyboard.isDown(keys.up)) and player.yvel > -player.speed and not cUp then
+		if checkGamepadAxis("lefty") ~= 0 then
+			player.yvel = player.yvel - player.speed*dt*math.abs(checkGamepadAxis("lefty"))
 		else
 			player.yvel = player.yvel - player.speed*dt
 		end
 	end
-	if joystick:isGamepadDown("rightshoulder") or love.mouse.isDown("l") then
+	if checkGamepadButton("rightshoulder") or love.mouse.isDown("l") then
 		if bullet.slowDown < bullet.time then
 			if love.mouse.isDown("l") then
 				player.shoot("mouse")
@@ -79,7 +79,7 @@ function player.control(dt)
 	        end
 	        bullet.time = 0
 	    end
-    elseif joystick:isGamepadDown("leftshoulder") or love.mouse.isDown("r") then
+    elseif checkGamepadButton("leftshoulder") or love.mouse.isDown("r") then
     	if bullet.powTime < bullet.maxPowTime then
     		bullet.powTime = bullet.powTime + dt
    		elseif bullet.powTime > bullet.maxPowTime then
@@ -92,7 +92,7 @@ end
 
 function player.shoot(controller)
 	if controller == "gamepad" then
-		bullet.create(controller, joystick:getGamepadAxis("rightx"), joystick:getGamepadAxis("righty"), player.x, player.y, player.w+5)
+		bullet.create(controller, checkGamepadAxis("rightx"), checkGamepadAxis("righty"), player.x, player.y, player.w+5)
 	else
 		bullet.create(controller, love.mouse.getX()+camera.x, love.mouse.getY()+camera.y, player.x, player.y, player.w+5)
 	end
