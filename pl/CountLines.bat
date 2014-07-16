@@ -3,8 +3,6 @@ setlocal
 if not [%1]==[] pushd %1
 for /r %%F in (*.lua) do call :sub "%%F"
 echo Total lines in %Files% files: %Total%
-set /a Total-=10543
-echo Total without pl lib: %Total%
 popd
 pause
 exit /b 0

@@ -1,11 +1,12 @@
 require "player"
 require "bullets"
 require "enemies"
+require "materials"
 map = {}
 currentMap = {}
 currentMap.health = {{}}
 currentMap.color = {}
-solids = {"*", "^", "?", "#"}
+
 
 function map.load(name)
 	love.filesystem.load("maps/"..name) ()
@@ -18,71 +19,27 @@ function map.load(name)
 		end
 		table.insert(MAPP, tmp1)
 	end
+	currentMap.spawners = deepcopy(spa)
 	currentMap.map = MAPP
 	currentMap.health = {}
 	local spawnersCount = 1
 	for i, v in ipairs(MAPP) do
 		currentMap.health[i] = {}
 		for j, b in ipairs(v) do
-			if b == "*" then
-				currentMap.health[i][j] = 10000 
-			elseif b == " " then
-				currentMap.health[i][j] = 0
-			elseif b == "^" then
-				if spa[spawnersCount].typ == 1 then
-					currentMap.health[i][j] = 100
-				elseif spa[spawnersCount].typ == 2 then
-					currentMap.health[i][j] = 100
-				end
-				spa[spawnersCount].x = j
-				spa[spawnersCount].y = i
-				spa[spawnersCount].spawn = true
-				spawnersCount= spawnersCount+1
+			currentMap.health[i][j] = materials.load(b, j, i, spawnersCount)
+			if b == "^" then
+				spawnersCount = spawnersCount + 1
 			end
 		end
 	end
 	currentMap.size = s
-	currentMap.spawners = spa
 end
 
 function map.draw()
 	spawnersCount = 1
 	for i, v in ipairs(currentMap.map) do
 		for j = 1, currentMap.size.w do 
-			local char = v[j]
-			if char == "*" then
-				love.graphics.setColor(50,50,50)
-				love.graphics.rectangle("fill", (j-1)*40, (i-1)*40, 40, 40)
-				--COLLISION HANDLING****
-				map.checkCollision((j-1)*40, (i-1)*40, 40, char)
-			end
-			if char == "^" then
-				local tmpSpawner = currentMap.spawners[spawnersCount]
-				if tmpSpawner.typ == 1 or tmpSpawner.typ == 2 then
-					love.graphics.setColor(50,50,50)
-					love.graphics.rectangle("fill", (j-1)*40, (i-1)*40, 40, 40)
-					love.graphics.polygon("fill", (j-1)*40, (i-1)*40, j*40, (i-1)*40, (j-1)*40+20, (i-1)*40-20)
-					love.graphics.polygon("fill", (j-1)*40, (i-1)*40, (j-1)*40, (i)*40, (j-1)*40-20, (i-1)*40+20)
-					love.graphics.polygon("fill", (j-1)*40, (i)*40, j*40, (i)*40, (j-1)*40+20, (i+1)*40-20)
-					love.graphics.polygon("fill", (j)*40, (i-1)*40, j*40, (i)*40, (j)*40+20, (i)*40-20)
-					love.graphics.setColor(0,0,255)
-					love.graphics.circle("fill", (j-1)*40+20, (i-1)*40+20, 12.5)
-				end
-				map.checkCollision((j-1)*40, (i-1)*40, 40, char)
-				spawnersCount = spawnersCount + 1
-			end
-			if char == "*" then
-				love.graphics.setColor(50,50,50)
-				love.graphics.rectangle("fill", (j-1)*40, (i-1)*40, 40, 40)
-				--COLLISION HANDLING****
-				map.checkCollision((j-1)*40, (i-1)*40, 40, char)
-			end
-			if char == "#" then
-				love.graphics.setColor(100,100,100)
-				love.graphics.rectangle("fill", (j-1)*40, (i-1)*40, 40, 40)
-				--COLLISION HANDLING****
-				map.checkCollision((j-1)*40, (i-1)*40, 40, char)
-			end
+			materials.draw(v[j], j, i)
 		end
 	end
 end
@@ -101,56 +58,55 @@ function map.checkCollision(mX, mY, mW, ch)
 		sth = ""
 		if player.x+player.w >= mX and player.x+player.w <= mX + mW/2 and player.xvel > 0 then
 			player.xvel = 0
+			player.x = player.x -0.1
 			cRight = true
 		else
 			cRight = false
 		end
 		if player.x-player.w <= mX+mW and player.x-player.w >= mX + mW/2 and player.xvel < 0 then
 			player.xvel = 0
+			player.x = player.x +0.1
 			cLeft = true
 		else
 			cLeft = false
 		end
 		if player.y+player.w >= mY and player.y+player.w <= mY + mW/2 and player.yvel > 0 then
 			player.yvel = 0
+			player.y = player.y -0.1
 			cDown = true
 		else
 			cDown = false
 		end
 		if player.y-player.w <= mY+mW and player.y-player.w >= mY + mW/2 and player.yvel < 0 then
 			player.yvel = 0
+			player.y = player.y +0.1
 			cUp = true
 		else
 			cUp = false
 		end
+	else
+		cUp = false
+		cDown = false
+		cLeft = false
+		cRight = false
 	end
 	for i, v in ipairs(enemies) do
-		if checkColl("rc", {x = mX, y = mY, w = mW}, v) then
-			sth = ""
-			if v.x+v.w >= mX and v.x+v.w <= mX + mW/2 and v.xvel > 0 then
-				sth = sth .. "r"
+			if checkColl("rc", {x = mX, y = mY, w = mW}, v) then
+				if v.x+v.w >= mX and v.x+v.w <= mX + mW/2 and v.xvel > 0 then
+				v.xvel = 0
+				v.x = v.x -1
 			end
 			if v.x-v.w <= mX+mW and v.x-v.w >= mX + mW/2 and v.xvel < 0 then
-				sth = sth .. "l"
+				v.xvel = 0
+				v.x = v.x +1
 			end
 			if v.y+v.w >= mY and v.y+v.w <= mY + mW/2 and v.yvel > 0 then
-				sth = sth .. "d"
+				v.yvel = 0
+				v.y = v.y -1
 			end
 			if v.y-v.w <= mY+mW and v.y-v.w >= mY + mW/2 and v.yvel < 0 then
-				sth = sth .. "u"
-			end
-			if sth == "r" then
-				v.xvel = 0
-				v.x = mX-v.w
-			elseif sth == "l" then
-				v.xvel = 0
-				v.x = mX+v.w*2
-			elseif sth == "d" then
 				v.yvel = 0
-				v.y = mY-v.w
-			elseif sth == "u" then
-				v.yvel = 0
-				v.y = mY+v.w*2
+				v.y = v.y + 1
 			end
 		end
 	end

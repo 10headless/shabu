@@ -4,6 +4,7 @@ require "enemies"
 require "map"
 require "camera"
 utils = require 'pl.utils'
+types = require 'pl.types'
 require('pl.stringx').import()
 require "build"
 
@@ -66,14 +67,16 @@ function checkColl(type, o1, o2)
 	if type == "cc" then
 		return checkCircleDis(o1, o2)
 	elseif type == "rc" then
+        o1.w1 = o1.w
         if o1.autom ~= nil then
             local tmpx1 = o1.x3 - o1.x4
             local tmpy1 = o1.y3 - o1.y4
             o1.w = math.sqrt(tmpx1^2 + tmpy1^2)
-            o1.x = o1.x1+20
-            o1.y = o1.y1+20 
+            o1.x = o1.x1
+            o1.y = o1.y1 +40
+            o1.w1 = 0
         end
-		if checkCircleDis({x = o1.x+o1.w/2, y = o1.y+o1.w/2, w = o1.w/2}, o2) then
+		if checkCircleDis({x = o1.x+o1.w1/2, y = o1.y+o1.w1/2, w = o1.w/2}, o2) then
             return true
         else
             for tmp = 1, 4 do
@@ -207,4 +210,18 @@ function checkGamepadButton(button)
     else
         return false
     end
+end
+
+function deepcopy(t)
+if type(t) ~= 'table' then return t end
+local mt = getmetatable(t)
+local res = {}
+for k,v in pairs(t) do
+if type(v) == 'table' then
+v = deepcopy(v)
+end
+res[k] = v
+end
+setmetatable(res,mt)
+return res
 end
