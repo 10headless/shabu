@@ -25,8 +25,10 @@ end
 
 function build.update(key)
 	if key == "ok" then
-		currentMap.map[build.curPos.y][build.curPos.x] = buildMat[build.chosenBlock].char
-		currentMap.health[build.curPos.y][build.curPos.x] = buildMat[build.chosenBlock].health
+		if currentMap.map[build.curPos.y][build.curPos.y] == " " then
+			currentMap.map[build.curPos.y][build.curPos.x] = buildMat[build.chosenBlock].char
+			currentMap.health[build.curPos.y][build.curPos.x] = buildMat[build.chosenBlock].health
+		end
 	elseif key == "down" then
 		build.curPos.y = build.curPos.y + 1
 	elseif key == "up" then
