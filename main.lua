@@ -39,7 +39,7 @@ function love.update(dt)
         player.update(dt)
         bullet.update(dt)
         enemy.update(dt)
-        map.updateSpawners(dt)
+        map.update(dt)
     end
     if gamestate == "pause" then
         build.update(dt)

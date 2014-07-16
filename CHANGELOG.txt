@@ -1,3 +1,5 @@
+***Alpha v0.2e***
+- enemies can destroy blocks now!
 ***Alpha v0.2d***
 - multiple building blocks in Build Mode
 - stopped using Penklight library. Started using Strong by BlackBulletIV

@@ -2,10 +2,11 @@
 solids = {"*", "^", "?", "#", "%", "$"}
 materials = {}
 buildMat = {
-{char = "#", health = 60},
+{char = "#", health = 100000},
 {char = "%", health = 40}--,
 --{char = "$", health = 5}
 }
+notDestroy = {"$", "^"}
 
 function materials.load(char, x, y,sp)
 	if char == "^" then

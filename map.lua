@@ -6,6 +6,7 @@ map = {}
 currentMap = {}
 currentMap.health = {{}}
 currentMap.color = {}
+currentMap.destroyWalls = {}
 
 
 function map.load(name)
@@ -37,6 +38,7 @@ end
 
 function map.draw()
 	spawnersCount = 1
+	destroyWalls = {}
 	for i, v in ipairs(currentMap.map) do
 		for j = 1, currentMap.size.w do 
 			materials.draw(v[j], j, i)
@@ -90,9 +92,11 @@ function map.checkCollision(mX, mY, mW, ch)
 		cLeft = false
 		cRight = false
 	end
+	local wallTouched = false
+	local enemyPower = 0
 	for i, v in ipairs(enemies) do
-			if checkColl("rc", {x = mX, y = mY, w = mW}, v) then
-				if v.x+v.w >= mX and v.x+v.w <= mX + mW/2 and v.xvel > 0 then
+		if checkColl("rc", {x = mX, y = mY, w = mW}, v) then
+			if v.x+v.w >= mX and v.x+v.w <= mX + mW/2 and v.xvel > 0 then
 				v.xvel = 0
 				v.x = v.x -1
 			end
@@ -108,7 +112,20 @@ function map.checkCollision(mX, mY, mW, ch)
 				v.yvel = 0
 				v.y = v.y + 1
 			end
+			local yes = true
+			for j, b in ipairs(notDestroy) do
+				if b == ch then yes = false end
+			end
+			if yes then
+				wallTouched = true
+				if enemyPower < v.damage then
+					enemyPower = v.damage
+				end
+			end
 		end
+	end
+	if wallTouched then
+		table.insert(currentMap.destroyWalls, {x = mX/40+1, y = mY/40+1, dmgPS = enemyPower})
 	end
 	remWalls = {}
 	remShots = {}
@@ -148,7 +165,7 @@ function map.checkCollision(mX, mY, mW, ch)
 	end
 end
 
-function map.updateSpawners(dt)
+function map.update(dt)
 	for i, v in ipairs(currentMap.spawners) do
 		if v.spawn then
 			v.timer = v.timer + dt
@@ -187,5 +204,15 @@ function map.updateSpawners(dt)
 			
 			end
 		end
+	end
+	local remWalls = {}
+	for i, v in ipairs(currentMap.destroyWalls) do
+		currentMap.health[v.y][v.x] = currentMap.health[v.y][v.x] - v.dmgPS/100*dt
+		if currentMap.health[v.y][v.x] <= 0 then
+			table.insert(remWalls, {x = v.x, y = v.y})
+		end
+	end
+	for i, v in ipairs(remWalls) do
+		currentMap.map[v.y][v.x] =" "
 	end
 end
