@@ -1,9 +1,14 @@
-solids = {"*", "^", "?", "#"}
+
+solids = {"*", "^", "?", "#", "%", "$"}
 materials = {}
+buildMat = {
+{char = "#", health = 60},
+{char = "%", health = 40}--,
+--{char = "$", health = 5}
+}
 
 function materials.load(char, x, y,sp)
 	if char == "^" then
-		print(sp)
 		currentMap.spawners[sp].x = x
 		currentMap.spawners[sp].y = y
 		currentMap.spawners[sp].spawn = true
@@ -41,16 +46,23 @@ function materials.draw(char, x, y)
 		map.checkCollision((x-1)*40, (y-1)*40, 40, char)
 		spawnersCount = spawnersCount + 1
 	end
-	if char == "*" then
-		love.graphics.setColor(50,50,50)
-		love.graphics.rectangle("fill", (x-1)*40, (y-1)*40, 40, 40)
-		--COLLISION HANDLING****
-		map.checkCollision((x-1)*40, (y-1)*40, 40, char)
-	end
 	if char == "#" then
 		love.graphics.setColor(100,100,100)
 		love.graphics.rectangle("fill", (x-1)*40, (y-1)*40, 40, 40)
 		--COLLISION HANDLING****
+		map.checkCollision((x-1)*40, (y-1)*40, 40, char)
+	end
+	if char == "%" then
+		love.graphics.setColor(155,118,83)
+		love.graphics.rectangle("fill", (x-1)*40, (y-1)*40, 40, 40)
+		--COLLISION HANDLING****
+		map.checkCollision((x-1)*40, (y-1)*40, 40, char)
+	end
+	if char == "$" then
+		love.graphics.setColor(50,50,50)
+		love.graphics.rectangle("fill", (x-1)*40, (y-1)*40, 40, 40)
+		love.graphics.setColor(255,0,0)
+		love.graphics.circle("fill", (x-1)*40+20, (y-1)*40+20, 12.5)
 		map.checkCollision((x-1)*40, (y-1)*40, 40, char)
 	end
 end

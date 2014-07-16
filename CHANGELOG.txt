@@ -1,3 +1,5 @@
+***Alpha v0.2d***
+- multiple building blocks in Build Mode
 ***Alpha v0.2c***
 - improved player-wall collision and enemy-wall collision
 - improved ease of implementing new types of blocks

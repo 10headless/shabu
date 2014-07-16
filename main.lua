@@ -8,7 +8,7 @@ types = require 'pl.types'
 require('pl.stringx').import()
 require "build"
 
-keys = {left = "a",right = "d",up = "w",down = "s",build = "lctrl", ok = "return"}
+keys = {left = "a",right = "d",up = "w",down = "s",build = "lctrl", ok = "return", change = " "}
 gamestate = "game"
 
 
@@ -22,6 +22,17 @@ function love.load()
         {
             vec4 texcolor = Texel(texture, texture_coords);
             return texcolor * color/2;
+        }]]
+        myShader3 = love.graphics.newShader[[vec4 effect( vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords )
+        {
+            vec4 texcolor = Texel(texture, texture_coords);
+            vec4 tmp = texcolor * color;
+            tmp.r = 0;
+            return tmp;
+        }]]
+    myShader2 = love.graphics.newShader[[vec4 effect( vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords )
+        {
+            return vec4(1,0,0,10);
         }]]
 end
 
@@ -40,22 +51,26 @@ end
 function love.draw()
     camera:set()
     if gamestate == "pause" then
-        build.draw()
         love.graphics.setShader(myShader)
     end
-
     if player.x >= (1280/2)-(player.w/2) and player.x <= currentMap.size.w*40-(1280/2)-(player.w/2)then
         camera.x = player.x-(1280/2)+(player.w/2)
     end 
     if player.y >= (720/2)-(player.w/2) and player.y <= currentMap.size.h*40-(720/2)-(player.w/2)then
         camera.y = player.y-(720/2)+(player.w/2)
     end 
+    
     player.draw()
     bullet.draw()
     enemy.draw()
     map.draw()
-    camera:unset()
+
     love.graphics.setShader()
+     if gamestate == "pause" then
+        build.draw()
+        
+    end
+    camera:unset()
 end
 
 function checkCircleDis(circleA, circleB)
@@ -130,6 +145,9 @@ function love.joystickpressed(joystick,button)
         if joystick:isGamepadDown("a") then
             build.update("ok")
         end
+        if joystick:isGamepadDown("b") then
+            build.update("change")
+        end
         if joystick:isGamepadDown("dpup") then
             build.update("up")
         end
@@ -170,6 +188,9 @@ function love.keypressed( key, isrepeat )
         end
         if key == keys.right then
             build.update("right")
+        end
+        if key == keys.change then
+            build.update("change")
         end
     end
     if key == keys.build then
