@@ -16,3 +16,8 @@ Controls: (gamepad in first brackets, keyboard in second)
 - selecting block in Build Mode [D-Pad] [wsad]
 - placing a block in Build Mode [A button] [enter]
 - changing blocks in Build Mode [B button] [space]
+
+Credits
+-------
+- Camera Module (by BlackBulletIV)
+- Strong lib (by BlackBulletIV)

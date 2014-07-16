@@ -3,9 +3,7 @@ require "bullets"
 require "enemies"
 require "map"
 require "camera"
-utils = require 'pl.utils'
-types = require 'pl.types'
-require('pl.stringx').import()
+require("strong")
 require "build"
 
 keys = {left = "a",right = "d",up = "w",down = "s",build = "lctrl", ok = "return", change = " "}
