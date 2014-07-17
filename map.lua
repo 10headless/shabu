@@ -7,7 +7,10 @@ currentMap = {}
 currentMap.health = {{}}
 currentMap.color = {}
 currentMap.destroyWalls = {}
-
+currentMap.bombs = {}
+ids = {}
+bomb = {}
+bomb.range = 140
 
 function map.load(name)
 	love.filesystem.load("maps/"..name) ()
@@ -92,8 +95,26 @@ function map.checkCollision(mX, mY, mW, ch)
 		cLeft = false
 		cRight = false
 	end
+	local remDess = {}
+	for j,b in ipairs(currentMap.destroyWalls) do
+		local hap = false
+		for i, v in ipairs(ids) do
+			if b.enemyID == v then
+				hap = true
+			end
+		end
+		if not hap then
+			table.insert(remDess, j)
+		end
+	end
+	for i, v in ipairs(remDess) do
+		table.remove(currentMap.destroyWalls, v)
+	end
 	local wallTouched = false
 	local enemyPower = 0
+	local enemyID = 0
+	
+
 	for i, v in ipairs(enemies) do
 		if checkColl("rc", {x = mX, y = mY, w = mW}, v) then
 			if v.x+v.w >= mX and v.x+v.w <= mX + mW/2 and v.xvel > 0 then
@@ -118,14 +139,27 @@ function map.checkCollision(mX, mY, mW, ch)
 			end
 			if yes then
 				wallTouched = true
+				table.insert(ids, enemyID)
 				if enemyPower < v.damage then
 					enemyPower = v.damage
+					enemyID = v.id
 				end
 			end
 		end
 	end
 	if wallTouched then
-		table.insert(currentMap.destroyWalls, {x = mX/40+1, y = mY/40+1, dmgPS = enemyPower})
+		local sth = false
+		for i, v in ipairs(currentMap.destroyWalls) do
+			if v.enemyID == enemyID then
+				sth = true
+			end
+			if v.x == mX/40+1 and v.y == mY/40+1 then
+				sth = true
+			end
+		end
+		if not sth then
+			table.insert(currentMap.destroyWalls, {x = mX/40+1, y = mY/40+1, dmgPS = enemyPower, enemyID = enemyID, des = false})
+		end
 	end
 	remWalls = {}
 	remShots = {}
@@ -143,6 +177,7 @@ function map.checkCollision(mX, mY, mW, ch)
 							b.spawn = false
 						end
 					end
+					table.insert(explosions, {anim = explosion_anim:clone(), x =mX+20, y = mY+20, scale = 1.5})
 				end
 			end
 		else
@@ -153,6 +188,7 @@ function map.checkCollision(mX, mY, mW, ch)
 				table.insert(remShots, i)
 				if currentMap.health[RTy][RTx] <= 0 then
 					table.insert(remWalls, {x = RTx, y = RTy})
+					table.insert(explosions, {anim = explosion_anim:clone(), x = mX+20, y = mY+20, scale = 0.8})
 				end
 			end
 		end
@@ -206,13 +242,40 @@ function map.update(dt)
 		end
 	end
 	local remWalls = {}
+	local remFromDestroy = {}
+	local remFromBombs = {}
 	for i, v in ipairs(currentMap.destroyWalls) do
-		currentMap.health[v.y][v.x] = currentMap.health[v.y][v.x] - v.dmgPS/100*dt
+		currentMap.health[v.y][v.x] = currentMap.health[v.y][v.x] - v.dmgPS *dt
 		if currentMap.health[v.y][v.x] <= 0 then
 			table.insert(remWalls, {x = v.x, y = v.y})
+			table.insert(remFromDestroy, i)
+		end
+	end
+	for i, v in ipairs(currentMap.bombs) do
+		if v.activated then
+			currentMap.health[v.y][v.x] = currentMap.health[v.y][v.x] - 1*dt
+			if currentMap.health[v.y][v.x] <= 0 then
+				table.insert(remWalls, {x = v.x, y = v.y})
+				table.insert(remFromBombs, i)
+				table.insert(explosions, {anim = explosion_anim:clone(), x = v.x*40-20, y = v.y*40-20, scale = 3.5})
+				for j, b in ipairs(enemies) do
+					local di = calcDis(b.x, b.y, b.w, v.x*40-20, v.y*40-20, bomb.range)
+					if di < 0 then
+						local damage = bomb.range/math.abs(di)*60+40
+						b.health = b.health-damage
+					end
+ 				end
+			end
 		end
 	end
 	for i, v in ipairs(remWalls) do
 		currentMap.map[v.y][v.x] =" "
+		table.insert(explosions, {anim = explosion_anim:clone(), x = v.x*40-20, y = v.y*40-20, scale = 0.7})
+	end
+	for i, v in ipairs(remFromDestroy) do
+		table.remove(currentMap.destroyWalls, v)
+	end
+	for i, v in ipairs(remFromBombs) do
+		table.remove(currentMap.bombs, v)
 	end
 end

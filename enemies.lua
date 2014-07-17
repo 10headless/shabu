@@ -3,9 +3,11 @@ require "bullets"
 
 enemy = {}
 enemies = {}
+enemy.counter = 1
 
 function enemy.load(x, y, w, speed, health,dmg)
-	table.insert(enemies, {x = x, y = y, w = w, speed = speed, health = health, maxHealth = health, damage = dmg, xvel = 0, yvel =0})
+	table.insert(enemies, {id = enemy.counter, x = x, y = y, w = w, speed = speed, health = health, maxHealth = health, damage = dmg, xvel = 0, yvel =0})
+	enemy.counter = enemy.counter + 1
 end
 
 
@@ -44,9 +46,6 @@ function enemy.collisionCheck(dt)
 			if checkCircleDis({x = b.x, y = b.y, w = b.w},{x = v.x, y = v.y, w = v.w}) then
 				v.health = v.health - b.dmg
 				table.insert(remShots, j)
-				if v.health <= 0 then
-					table.insert(remEnemy, i)
-				end
 			end
 		end
 		if checkColl("cc", player, v) then
@@ -56,7 +55,11 @@ function enemy.collisionCheck(dt)
 				love.event.quit()
 			end
 		end
+		if v.health <= 0 then
+			table.insert(remEnemy, i)
+		end
 	end
+
 	for i, v in ipairs(remEnemy) do
 		table.remove(enemies, v)
 	end

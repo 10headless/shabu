@@ -28,6 +28,9 @@ function build.update(key)
 		if currentMap.map[build.curPos.y][build.curPos.y] == " " then
 			currentMap.map[build.curPos.y][build.curPos.x] = buildMat[build.chosenBlock].char
 			currentMap.health[build.curPos.y][build.curPos.x] = buildMat[build.chosenBlock].health
+			if buildMat[build.chosenBlock].char == "$" then
+				table.insert(currentMap.bombs, {x = build.curPos.x, y = build.curPos.y, activated = true})
+			end
 		end
 	elseif key == "down" then
 		build.curPos.y = build.curPos.y + 1
@@ -53,6 +56,12 @@ function build.draw()
 			if j == build.curPos.x and i == build.curPos.y then
 				love.graphics.setColor(0,255,0)
 				love.graphics.rectangle("line", x+2, y+2, 36, 36)
+				if buildMat[build.chosenBlock].char == "$" then
+					love.graphics.setShader(myShader)
+					love.graphics.setColor(0,0,255)
+					love.graphics.circle("fill", x+20, y+20, 140)
+					love.graphics.setShader()
+				end
 			else
 				love.graphics.setColor(150,150,150)
 				love.graphics.rectangle("line", x, y, 40, 40)

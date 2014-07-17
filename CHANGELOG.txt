@@ -1,10 +1,15 @@
+***Alpha v0.3***
+- simple bombs now added (REALLY BUGGY)
+- Anim8 is now used for animating
+- added many cool looking explosions!
+- fixed some stuff with enemies destroying wrong blocks
 ***Alpha v0.2e***
 - enemies can destroy blocks now!
 - fixed the bug that allowed you to place blocks over another blocks
 - changed the window name to 'SHaBU'
 ***Alpha v0.2d***
 - multiple building blocks in Build Mode
-- stopped using Penklight library. Started using Strong by BlackBulletIV
+- stopped using Penlight library. Started using Strong by BlackBulletIV
 ***Alpha v0.2c***
 - improved player-wall collision and enemy-wall collision
 - improved ease of implementing new types of blocks

@@ -3,8 +3,8 @@ solids = {"*", "^", "?", "#", "%", "$"}
 materials = {}
 buildMat = {
 {char = "#", health = 100000},
-{char = "%", health = 40}--,
---{char = "$", health = 5}
+{char = "%", health = 40},
+{char = "$", health = 5}
 }
 notDestroy = {"$", "^"}
 

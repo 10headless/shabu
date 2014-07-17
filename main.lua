@@ -3,11 +3,13 @@ require "bullets"
 require "enemies"
 require "map"
 require "camera"
-require("strong")
+require "strong"
 require "build"
+anim8 = require 'anim8'
 
 keys = {left = "a",right = "d",up = "w",down = "s",build = "lctrl", ok = "return", change = " "}
 gamestate = "game"
+explosions = {}
 
 
 function love.load()
@@ -32,6 +34,11 @@ function love.load()
         {
             return vec4(1,0,0,10);
         }]]
+
+    explosion_image = love.graphics.newImage('assets/explosion.png')
+    explosion_grid = anim8.newGrid(64,64, 320,320, 0, 2)
+    explosion_anim = anim8.newAnimation(explosion_grid('1-5',1,'1-5',2,'1-5',3,'1-5',4,'1-5',5), {['1-3']= 0.01,['4-16'] = 0.02, ['17-25']=0.045}, "pauseAtEnd")
+    explosion_size = 64
 end
 
 function love.update(dt)
@@ -40,6 +47,17 @@ function love.update(dt)
         bullet.update(dt)
         enemy.update(dt)
         map.update(dt)
+
+        local remExplosions = {}
+        for i, v in ipairs(explosions) do
+            v.anim:update(dt)
+            if v.anim.status == "paused" then
+                table.insert(remExplosions, i)
+            end
+        end
+        for i, v in ipairs(remExplosions) do
+            table.remove(explosions, v)
+        end
     end
     if gamestate == "pause" then
         build.update(dt)
@@ -62,6 +80,10 @@ function love.draw()
     bullet.draw()
     enemy.draw()
     map.draw()
+    for i, v in ipairs(explosions) do
+        love.graphics.setColor(255,255,255)
+        v.anim:draw(explosion_image, v.x-explosion_size*v.scale/2, v.y-explosion_size*v.scale/2, 0, v.scale)
+    end
 
     love.graphics.setShader()
      if gamestate == "pause" then
@@ -243,4 +265,8 @@ res[k] = v
 end
 setmetatable(res,mt)
 return res
+end
+
+function calcDis(x1, y1, w1, x2, y2, w2)
+    return math.sqrt(math.abs(x1-x2)^2+math.abs(y1-y2)^2)-w1-w2
 end

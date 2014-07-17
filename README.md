@@ -6,7 +6,7 @@ IN CASE OF ANY CONFUSION THIS IS AN EXPLANATION OF MY NAMING SCHEME:
 - the pre-word ('Alpha', 'Beta') doesn't really mean anything. It's mostly there in case I run out of numbers :) (I don't like versions like 0.10 or 0.11, they are confusing :/ )
 - everything with '0.' at the beginning is a snapshot, not really stable
 - if it has '1.' it means it's stable
-- even though '0.8' is a theoretically a smaller number than '1.1', it doesn't mean it's older than '1.1'. It doesn't mean the opposite either.
+- even though '0.8' is theoretically a smaller number than '1.1', it doesn't mean it's older than '1.1'. It doesn't have to mean the opposite either.
 
 Controls: (gamepad in first brackets, keyboard in second)
 - player movement [left stick] [wsad]
@@ -21,3 +21,4 @@ Credits
 -------
 - Camera Module (by BlackBulletIV)
 - Strong lib (by BlackBulletIV)
+- Anim8 (by Kikito)
