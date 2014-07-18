@@ -156,7 +156,33 @@ function checkColl(type, o1, o2)
 		local ax2,ay2,bx2,by2 = o1.x + o1.w, o1.y + o1.h, o2.x + o2.w, o2.y + o2.h
   		return ax1 < bx2 and ax2 > bx1 and ay1 < by2 and ay2 > by1
 	elseif type == "OMG" then
-
+        for tmp = 1, 3 do
+            local tmpY = 0
+            local tmpX = 0
+            if o1.ver then
+                if tmp == 1 then
+                    tmpY = o1.y
+                elseif tmp == 2 then
+                    tmpY = o1.y + o1.w/2
+                elseif tmp == 3 then
+                    tmpY = o1.y + o1.w
+                end
+                tmpX = o1.x
+            else 
+                if tmp == 1 then
+                    tmpX = o1.x
+                elseif tmp == 2 then
+                    tmpX = o1.x + o1.w/2
+                elseif tmp == 3 then
+                    tmpX = o1.x + o1.w
+                end
+                tmpY = o1.y
+            end
+            if checkCircleDis({x = tmpX, y= tmpY, w = 2}, o2) then
+                return true
+            end
+        end
+        return false
     end
 end
 

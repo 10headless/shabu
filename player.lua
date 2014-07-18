@@ -2,10 +2,6 @@ require "bullets"
 require "camera"
 
 player = {}
-cUp = false
-cDown = false
-cLeft = false
-cRight = false
 
 function player.load(x, y)
 	player.x = x
@@ -34,7 +30,7 @@ function player.physics(dt)
 end
 
 function player.control(dt)
-	if (checkGamepadAxis("leftx") > 0 or love.keyboard.isDown(keys.right)) and player.xvel < player.speed and not cRight then
+	if (checkGamepadAxis("leftx") > 0 or love.keyboard.isDown(keys.right)) and player.xvel < player.speed then
 		if checkGamepadAxis("leftx") ~= 0 then
 			player.xvel = player.xvel + player.speed*dt*math.abs(checkGamepadAxis("leftx"))/(1*(math.abs(checkGamepadAxis("lefty"))+1))
 		else
@@ -45,7 +41,7 @@ function player.control(dt)
 			end
 		end
 	end
-	if (checkGamepadAxis("leftx") < 0 or love.keyboard.isDown(keys.left)) and player.xvel > -player.speed and not cLeft then
+	if (checkGamepadAxis("leftx") < 0 or love.keyboard.isDown(keys.left)) and player.xvel > -player.speed then
 		if checkGamepadAxis("leftx") ~= 0 then
 			player.xvel = player.xvel - player.speed*dt*math.abs(checkGamepadAxis("leftx"))/(1*(math.abs(checkGamepadAxis("lefty"))+1))
 		else
@@ -56,14 +52,14 @@ function player.control(dt)
 			end
 		end
 	end
-	if (checkGamepadAxis("lefty") > 0 or love.keyboard.isDown(keys.down)) and player.yvel < player.speed and not cDown then
+	if (checkGamepadAxis("lefty") > 0 or love.keyboard.isDown(keys.down)) and player.yvel < player.speed then
 		if checkGamepadAxis("lefty") ~= 0 then
 			player.yvel = player.yvel + player.speed*dt*math.abs(checkGamepadAxis("lefty"))
 		else
 			player.yvel = player.yvel + player.speed*dt
 		end
 	end
-	if (checkGamepadAxis("lefty") < 0 or love.keyboard.isDown(keys.up)) and player.yvel > -player.speed and not cUp then
+	if (checkGamepadAxis("lefty") < 0 or love.keyboard.isDown(keys.up)) and player.yvel > -player.speed then
 		if checkGamepadAxis("lefty") ~= 0 then
 			player.yvel = player.yvel - player.speed*dt*math.abs(checkGamepadAxis("lefty"))
 		else

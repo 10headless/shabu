@@ -1,3 +1,7 @@
+***Alpha v0.3b***
+- collision fixes
+- even more collision fixes
+- bombs destroy walls now
 ***Alpha v0.3***
 - simple bombs now added (REALLY BUGGY)
 - Anim8 is now used for animating

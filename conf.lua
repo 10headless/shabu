@@ -4,4 +4,6 @@ function love.conf(t)
 	t.window.height = 720              -- The window height (number)
 	t.window.borderless = false 
 	t.window.visible = true
+	t.window.vsync = false
+	
 end

@@ -5,8 +5,8 @@ enemy = {}
 enemies = {}
 enemy.counter = 1
 
-function enemy.load(x, y, w, speed, health,dmg)
-	table.insert(enemies, {id = enemy.counter, x = x, y = y, w = w, speed = speed, health = health, maxHealth = health, damage = dmg, xvel = 0, yvel =0})
+function enemy.load(x, y, w, speed, health,dmg, friction)
+	table.insert(enemies, {id = enemy.counter, x = x, y = y, w = w, speed = speed, friction = friction,health = health, maxHealth = health, damage = dmg, xvel = 0, yvel =0})
 	enemy.counter = enemy.counter + 1
 end
 
@@ -30,12 +30,13 @@ function enemy.move(dt)
 		if rY > 0 then
 			abY = -abY
 		end
-		v.x = v.x + v.xvel * dt
-		v.y = v.y + v.yvel * dt
-		v.xvel = abX
-		v.yvel = abY
+		v.xvel = v.xvel + abX * dt
+		v.yvel = v.yvel + abY * dt
+		v.xvel = v.xvel * (1 - math.min(dt*v.friction, 1))
+		v.yvel = v.yvel * (1 - math.min(dt*v.friction, 1))
+		v.x = v.x + v.xvel*dt
+		v.y = v.y + v.yvel*dt
 	end
-	enemy.collisionCheck(dt)
 end
 
 function enemy.collisionCheck(dt)
