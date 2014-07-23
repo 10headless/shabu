@@ -5,17 +5,24 @@ require "map"
 require "camera"
 require "strong"
 require "build"
+require "materials"
 anim8 = require 'anim8'
 
 keys = {left = "a",right = "d",up = "w",down = "s",build = "lctrl", ok = "return", change = " "}
 gamestate = "game"
 explosions = {}
+stone_img = {}
+stone_img[1] = love.graphics.newImage('assets/stone2.png')
+stone_img[2] = love.graphics.newImage('assets/stone3.png')
+player_img = love.graphics.newImage('assets/player.png')
 
 
 function love.load()
+    math.randomseed( os.time() )
+    math.random(); math.random(); math.random()
     local joysticks = love.joystick.getJoysticks()
     joystick = joysticks[1]
-    love.graphics.setBackgroundColor(200,200,200)
+    love.graphics.setBackgroundColor(240,240,240)
     player.load(200, 200)
     map.load("testMap.lua")
     myShader = love.graphics.newShader[[vec4 effect( vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords )
@@ -39,6 +46,10 @@ function love.load()
     explosion_grid = anim8.newGrid(64,64, 320,320, 0, 2)
     explosion_anim = anim8.newAnimation(explosion_grid('1-5',1,'1-5',2,'1-5',3,'1-5',4,'1-5',5), {['1-3']= 0.01,['4-16'] = 0.02, ['17-25']=0.045}, "pauseAtEnd")
     explosion_size = 64
+    player_grid = anim8.newGrid(88,88,528, 88)
+    player_anim = anim8.newAnimation(player_grid('1-6',1), 0.1)
+    player_size = 88
+    materials.loveLoad()
 end
 
 function love.update(dt)
@@ -47,7 +58,7 @@ function love.update(dt)
         bullet.update(dt)
         enemy.update(dt)
         map.update(dt)
-
+        player_anim:update(dt)
         local remExplosions = {}
         for i, v in ipairs(explosions) do
             v.anim:update(dt)
@@ -84,7 +95,6 @@ function love.draw()
         love.graphics.setColor(255,255,255)
         v.anim:draw(explosion_image, v.x-explosion_size*v.scale/2, v.y-explosion_size*v.scale/2, 0, v.scale)
     end
-
     love.graphics.setShader()
      if gamestate == "pause" then
         build.draw()

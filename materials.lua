@@ -1,12 +1,17 @@
 
-solids = {"*", "^", "?", "#", "%", "$"}
-materials = {}
-buildMat = {
-{char = "#", health = 100000},
-{char = "%", health = 40},
-{char = "$", health = 5}
-}
-notDestroy = {"$", "^"}
+	materials = {}
+
+stone_img = love.graphics.newImage('assets/stone.png')
+
+function materials.loveLoad()
+	solids = {"*", "^", "?", "#", "%", "$"}
+	buildMat = {
+	{char = "#", health = 100000},
+	{char = "%", health = 40},
+	{char = "$", health = 5}
+	}
+	notDestroy = {"$", "^"}
+end
 
 function materials.load(char, x, y,sp)
 	if char == "^" then
@@ -14,21 +19,23 @@ function materials.load(char, x, y,sp)
 		currentMap.spawners[sp].y = y
 		currentMap.spawners[sp].spawn = true
 		if currentMap.spawners[sp].typ == 1 then
-			return 100
+			return 100, 0
 		elseif currentMap.spawners[sp].typ == 2 then
-			return 100
+			return 100, 0
 		end
 	elseif char == " " then
-		return 0
+		return 0, 0
 	elseif char == "*" then
-		return 100000
+		local r = math.random(1, 2)
+		return 100000, r
 	end
 end
 
 function materials.draw(char, x, y)
 	if char == "*" then
-		love.graphics.setColor(50,50,50)
-		love.graphics.rectangle("fill", (x-1)*40, (y-1)*40, 40, 40)
+		love.graphics.setColor(255,255,255)
+		local ori = currentMap.orient[y][x]
+		love.graphics.draw(stone_img[currentMap.orient[y][x]], (x-1)*40, (y-1)*40)
 		--COLLISION HANDLING****
 		map.checkCollision((x-1)*40, (y-1)*40, 40, char)
 	end
@@ -48,14 +55,14 @@ function materials.draw(char, x, y)
 		spawnersCount = spawnersCount + 1
 	end
 	if char == "#" then
-		love.graphics.setColor(100,100,100)
-		love.graphics.rectangle("fill", (x-1)*40, (y-1)*40, 40, 40)
+		love.graphics.setColor(255,255,255)
+		love.graphics.draw(stone_img[1], (x-1)*40, (y-1)*40)
 		--COLLISION HANDLING****
 		map.checkCollision((x-1)*40, (y-1)*40, 40, char)
 	end
 	if char == "%" then
-		love.graphics.setColor(155,118,83)
-		love.graphics.rectangle("fill", (x-1)*40, (y-1)*40, 40, 40)
+		love.graphics.setColor(255,255,255)
+		love.graphics.draw(stone_img[1], (x-1)*40, (y-1)*40)
 		--COLLISION HANDLING****
 		map.checkCollision((x-1)*40, (y-1)*40, 40, char)
 	end

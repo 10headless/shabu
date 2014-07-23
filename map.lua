@@ -11,6 +11,7 @@ currentMap.color = {}
 currentMap.destroyWalls = {}
 currentMap.bombs = {}
 currentMap.wires = {}
+currentMap.orient = {}
 ids = {}
 bomb = {}
 bomb.range = 140
@@ -32,8 +33,9 @@ function map.load(name)
 	local spawnersCount = 1
 	for i, v in ipairs(MAPP) do
 		currentMap.health[i] = {}
+		currentMap.orient[i] = {}
 		for j, b in ipairs(v) do
-			currentMap.health[i][j] = materials.load(b, j, i, spawnersCount)
+			currentMap.health[i][j], currentMap.orient[i][j] = materials.load(b, j, i, spawnersCount)
 			if b == "^" then
 				spawnersCount = spawnersCount + 1
 			end

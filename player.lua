@@ -30,6 +30,7 @@ function player.physics(dt)
 end
 
 function player.control(dt)
+
 	if (checkGamepadAxis("leftx") > 0 or love.keyboard.isDown(keys.right)) and player.xvel < player.speed then
 		if checkGamepadAxis("leftx") ~= 0 then
 			player.xvel = player.xvel + player.speed*dt*math.abs(checkGamepadAxis("leftx"))/(1*(math.abs(checkGamepadAxis("lefty"))+1))
@@ -40,6 +41,7 @@ function player.control(dt)
 				player.xvel = player.xvel + player.speed*dt
 			end
 		end
+	
 	end
 	if (checkGamepadAxis("leftx") < 0 or love.keyboard.isDown(keys.left)) and player.xvel > -player.speed then
 		if checkGamepadAxis("leftx") ~= 0 then
@@ -51,6 +53,7 @@ function player.control(dt)
 				player.xvel = player.xvel - player.speed*dt
 			end
 		end
+	
 	end
 	if (checkGamepadAxis("lefty") > 0 or love.keyboard.isDown(keys.down)) and player.yvel < player.speed then
 		if checkGamepadAxis("lefty") ~= 0 then
@@ -58,6 +61,7 @@ function player.control(dt)
 		else
 			player.yvel = player.yvel + player.speed*dt
 		end
+	
 	end
 	if (checkGamepadAxis("lefty") < 0 or love.keyboard.isDown(keys.up)) and player.yvel > -player.speed then
 		if checkGamepadAxis("lefty") ~= 0 then
@@ -65,7 +69,15 @@ function player.control(dt)
 		else
 			player.yvel = player.yvel - player.speed*dt
 		end
+	
 	end
+
+	if player.xvel < 10 and player.xvel > -10 and player.yvel < 10 and player.yvel > -10 then
+		player_anim:pause()
+	else
+		player_anim:resume()
+	end
+
 	if checkGamepadButton("rightshoulder") or love.mouse.isDown("l") then
 		if bullet.slowDown < bullet.time then
 			if love.mouse.isDown("l") then
@@ -96,10 +108,6 @@ end
 
 --DRAWING************************************
 function player.draw()
-	love.graphics.setColor(0,0,0)
-	love.graphics.circle("fill", player.x, player.y, player.w)
-	love.graphics.setColor(255,0,0)
-	love.graphics.arc( "fill", player.x, player.y, player.w, 0, (math.pi*2)*(player.health/player.maxHealth))
-	love.graphics.setColor(0,0,0)
-	love.graphics.circle("fill", player.x, player.y, player.w-7)
+	love.graphics.setColor(255,255,255)
+	player_anim:draw(player_img, player.x-player_size/2, player.y-player_size/2)
 end
