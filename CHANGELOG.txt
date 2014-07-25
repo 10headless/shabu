@@ -1,4 +1,6 @@
-***Aplha v0.3c***
+***Alpha v0.3d***
+- even more graphics (working on EVEN EVEN MORE graphics)
+***Alpha v0.3c***
 - some new graphics
 ***Alpha v0.3b***
 - collision fixes

@@ -1,7 +1,4 @@
-
-	materials = {}
-
-stone_img = love.graphics.newImage('assets/stone.png')
+materials = {}
 
 function materials.loveLoad()
 	solids = {"*", "^", "?", "#", "%", "$"}
@@ -26,7 +23,7 @@ function materials.load(char, x, y,sp)
 	elseif char == " " then
 		return 0, 0
 	elseif char == "*" then
-		local r = math.random(1, 2)
+		local r = math.random(1, 3)
 		return 100000, r
 	end
 end
@@ -62,7 +59,7 @@ function materials.draw(char, x, y)
 	end
 	if char == "%" then
 		love.graphics.setColor(255,255,255)
-		love.graphics.draw(stone_img[1], (x-1)*40, (y-1)*40)
+		love.graphics.draw(dirt_img, (x-1)*40, (y-1)*40)
 		--COLLISION HANDLING****
 		map.checkCollision((x-1)*40, (y-1)*40, 40, char)
 	end

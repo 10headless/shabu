@@ -48,8 +48,14 @@ function map.draw()
 	spawnersCount = 1
 	destroyWalls = {}
 	for i, v in ipairs(currentMap.map) do
+		local modulo = 1
 		for j = 1, currentMap.size.w do 
+			if modulo/2 ~= math.floor(modulo/2) then
+				love.graphics.setColor(255,255,255)
+				love.graphics.draw(wood_img, (j-1)*40, (i-1)*40)
+			end
 			materials.draw(v[j], j, i)
+			modulo = modulo + 1
 		end
 	end
 end

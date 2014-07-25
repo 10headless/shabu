@@ -73,11 +73,7 @@ end
 --DRAWING************************************
 function enemy.draw()
 	for i, v in ipairs(enemies) do
-		love.graphics.setColor(0,0,255)
-		love.graphics.circle("fill", v.x, v.y, v.w)
-		love.graphics.setColor(255,0,0)
-		love.graphics.arc( "fill", v.x, v.y, v.w, 0, (math.pi*2)*(v.health/v.maxHealth))
-		love.graphics.setColor(0,0,255)
-		love.graphics.circle("fill", v.x, v.y, v.w-7)
+		love.graphics.setColor(255,255,255)
+		love.graphics.draw(enemy_img, v.x-v.w, v.y-v.w)
 	end
 end

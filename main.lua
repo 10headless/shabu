@@ -14,8 +14,12 @@ explosions = {}
 stone_img = {}
 stone_img[1] = love.graphics.newImage('assets/stone2.png')
 stone_img[2] = love.graphics.newImage('assets/stone3.png')
-player_img = love.graphics.newImage('assets/player.png')
-
+stone_img[3] = love.graphics.newImage('assets/stone1.png')
+dirt_img = love.graphics.newImage('assets/dirt.png')
+wood_img = love.graphics.newImage('assets/wood.png')
+player_img = love.graphics.newImage('assets/player1.png')
+enemy_img = love.graphics.newImage('assets/enemy.png')
+ 
 
 function love.load()
     math.randomseed( os.time() )
@@ -46,9 +50,9 @@ function love.load()
     explosion_grid = anim8.newGrid(64,64, 320,320, 0, 2)
     explosion_anim = anim8.newAnimation(explosion_grid('1-5',1,'1-5',2,'1-5',3,'1-5',4,'1-5',5), {['1-3']= 0.01,['4-16'] = 0.02, ['17-25']=0.045}, "pauseAtEnd")
     explosion_size = 64
-    player_grid = anim8.newGrid(88,88,528, 88)
-    player_anim = anim8.newAnimation(player_grid('1-6',1), 0.1)
-    player_size = 88
+    player_grid = anim8.newGrid(91,80,91, 80)
+    player_anim = anim8.newAnimation(player_grid(1,1), 0.1)
+    player_size = 86
     materials.loveLoad()
 end
 
@@ -86,11 +90,10 @@ function love.draw()
     if player.y >= (720/2)-(player.w/2) and player.y <= currentMap.size.h*40-(720/2)-(player.w/2)then
         camera.y = player.y-(720/2)+(player.w/2)
     end 
-    
+     map.draw()
     player.draw()
     bullet.draw()
     enemy.draw()
-    map.draw()
     for i, v in ipairs(explosions) do
         love.graphics.setColor(255,255,255)
         v.anim:draw(explosion_image, v.x-explosion_size*v.scale/2, v.y-explosion_size*v.scale/2, 0, v.scale)
